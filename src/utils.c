@@ -16,13 +16,10 @@ void extract_external_commands(char **cmdv) {
         strcpy(curr_cmd, local_buffer);
         cmdv[cmd_ind++] = curr_cmd;
     }
-    // for (int i = 0; i < cmd_ind; i++) {
-    //     printf("%d -> %s\n", i, cmdv[i]);
-    // }
     return;
 }
 
-static int check_prompt_change(char *prompt, char *input_string) {
+int check_prompt_change(char *prompt, char *input_string) {
     if (strncmp(input_string, "PS1", 3) == 0) {
         if (input_string[3] == '=')
             return 0;
@@ -50,29 +47,6 @@ char *get_command(char *input_string) {
     strcpy(cmd, local_buffer);
     return cmd;
 }
-
-void scan_input(char *prompt, char *input_string) {
-    char *cmdv[200];
-    extract_external_commands(cmdv);
-    while (1) {
-        printf("\n%s", prompt);
-        // check if it is PS1
-        // if it is copy_change prompt
-        fgets(input_string, 100, stdin);
-        input_string[strcspn(input_string, "\n")] = '\0';
-        if (check_prompt_change(prompt, input_string) == 0) {
-            copy_change(prompt, input_string);
-        }
-        // if not get command
-        else {
-            char *cmd = get_command(input_string);
-            printf("cmd -> %s", cmd);
-        }
-        // check for internal, external or no command
-    }
-}
-
-void copy_change(char *prompt, char *input_string);
 
 int check_command_type(char *command);
 void echo(char *input_string, int status);

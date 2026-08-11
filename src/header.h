@@ -26,6 +26,8 @@
 
 // default prompt is minishell
 void scan_input(char *prompt, char *input_string);
+
+void extract_external_commands(char **external_commands);
 // check for prompt update before using get_command
 // use strncmp
 char *get_command(char *input_string);
@@ -35,10 +37,10 @@ char *get_command(char *input_string);
 void copy_change(char *prompt, char *input_string);
 
 int check_command_type(char *command);
+int check_prompt_change(char *prompt, char *input_string);
 void echo(char *input_string, int status);
 void execute_internal_commands(char *input_string);
 void execute_external_commands(char *input_string);
 void signal_handler(int sig_num);
-void extract_external_commands(char **external_commands);
 
 #endif
