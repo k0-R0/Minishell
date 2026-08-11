@@ -1,10 +1,10 @@
 #include "header.h"
 
 char *builtins[] = {
-    "echo",    "printf",   "read",    "cd",     "pwd",   "pushd",  "popd",
-    "dirs",    "let",      "eval",    "set",    "unset", "export", "declare",
-    "typeset", "readonly", "getopts", "source", "exit",  "exec",   "shopt",
-    "caller",  "true",     "type",    "hash",   "bind",  "help",   NULL};
+    "caller",   "true",    "type",   "hash",  "bind",   "help",    "dirs",
+    "let",      "eval",    "set",    "unset", "export", "declare", "echo",
+    "printf",   "read",    "cd",     "pwd",   "pushd",  "popd",    "typeset",
+    "readonly", "getopts", "source", "exit",  "exec",   "shopt",   NULL};
 
 void extract_external_commands(char **cmdv) {
     FILE *fptr = fopen("external_commands.txt", "r");
