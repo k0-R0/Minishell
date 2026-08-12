@@ -68,4 +68,16 @@ void echo(char *input_string) {
     }
 }
 
-void execute_external_commands(char *input_string) {}
+void execute_external_commands(char *input_string) {
+    char *tokens[100];
+    getwords(tokens, input_string);
+    int pipe_count = 0;
+    get_pipe_count(tokens, &pipe_count);
+    if (pipe_count == 0) {
+        if (execvp(tokens[0], tokens) == -1) {
+            perror(NULL);
+        }
+    } else {
+        printf("%sInvalid argument%s", ANSI_COLOR_RED, ANSI_COLOR_RESET);
+    }
+}
