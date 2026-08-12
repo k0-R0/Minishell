@@ -43,5 +43,7 @@ void execute_internal_commands(char *input_string);
 void execute_external_commands(char *input_string);
 void signal_handler(int sig_num);
 char bin_search(const char *const argv[], int size, const char *target);
+void getwords(char *tokens[], const char *const input_string);
+void get_pipe_count(char *tokens[], int *pipe_count);
 
 #endif

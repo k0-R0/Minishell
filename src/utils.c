@@ -35,3 +35,42 @@ char bin_search(const char *const argv[], int size, const char *target) {
     }
     return 0;
 }
+
+void getwords(char *tokens[], const char *const input_string) {
+    int token_count = 0;
+    int prev_ind = -1;
+    int curr_ind = 0;
+    // use prev ind to keep track of last ' '
+    while (input_string[curr_ind]) {
+        char curr = input_string[curr_ind];
+        char prev = (prev_ind == -1) ? ' ' : input_string[prev_ind];
+        if (prev == ' ' && curr != ' ') {
+            // word found when prev is ' ' and curr is not ' '
+            prev_ind = curr_ind;
+            // iterate forward till curr is NULL or ' ' that is the end of word
+            while (input_string[curr_ind] != '\0' &&
+                   input_string[curr_ind] != ' ')
+                curr_ind++;
+            // word length = curr pos - prev , malloc and copy the pointer to it
+            int len = curr_ind - prev_ind;
+            char *curr_token = malloc(len * sizeof(char));
+            strncpy(curr_token, input_string + prev_ind, len);
+            tokens[token_count++] = curr_token;
+            printf("%s\n", tokens[token_count - 1]);
+        } else {
+            prev_ind = curr_ind++;
+        }
+    }
+    tokens[token_count++] = NULL;
+}
+
+void get_pipe_count(char *tokens[], int *pipe_count) {
+    int count = 0;
+    int ind = 0;
+    while (tokens[ind]) {
+        if (strlen(tokens[ind]) == 1 && tokens[ind][0] == '|')
+            count++;
+        ind++;
+    }
+    *pipe_count = count;
+}
