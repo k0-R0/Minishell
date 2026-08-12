@@ -11,11 +11,9 @@ int cmd_count;
 
 int check_command_type(char *command) {
     // check builtins
-    printf("checking builtin\n");
     if (bin_search(builtins, sizeof(builtins) / sizeof(builtins[0]), command) ==
         1)
         return BUILTIN;
-    printf("checking external\n");
     // check externals
     if (bin_search(cmdv, sizeof(cmdv) / sizeof(cmdv[0]), command) == 1)
         return EXTERNAL;
@@ -37,10 +35,15 @@ void scan_input(char *prompt, char *input_string) {
         // if not get command
         else {
             char *command = get_command(input_string);
-            printf("cmd -> %s\n", command);
+            // printf("cmd -> %s\n", command);
             // check for internal, external or no command
             char command_type = check_command_type(command);
-            printf("%d\n", command_type);
+            if (command_type == NO_COMMAND) {
+                printf("%sNo such command found\n%s", ANSI_COLOR_RED,
+                       ANSI_COLOR_RESET);
+                continue;
+            }
+            // printf("%d\n", command_type);
         }
     }
 }

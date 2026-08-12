@@ -1,20 +1,20 @@
 #include "header.h"
+#include <string.h>
 
 int check_prompt_change(char *prompt, char *input_string) {
-    if (strncmp(input_string, "PS1", 3) == 0) {
-        if (input_string[3] == '=')
+    if (strlen(input_string) > 4 && strncmp(input_string, "PS1", 3) == 0) {
+        if (input_string[3] == '=' && input_string[4] != ' ')
             return 0;
-        else {
-            printf("error in command\n");
-            return 1;
-        }
+        else
+            printf("%serror in command\n%s", ANSI_COLOR_RED, ANSI_COLOR_RESET);
     }
     return 1;
 }
 void copy_change(char *prompt, char *input_string) {
     char local_buffer[100];
-    strcpy(local_buffer, input_string + 4);
-    sprintf(prompt, "%s%s %s>%s", ANSI_COLOR_BLUE, local_buffer,
+    sprintf(local_buffer, "%s", input_string + 4);
+    local_buffer[strcspn(local_buffer, " ")] = '\0';
+    sprintf(prompt, "%s%s%s> %s", ANSI_COLOR_BLUE, local_buffer,
             ANSI_COLOR_YELLOW, ANSI_COLOR_RESET);
 }
 
