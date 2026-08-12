@@ -1,12 +1,12 @@
 ## empty command not error
 
-## external_command
+~~## external_command~~
 - fork
 - keep pid ,status(wait) global
 - convert input string to a 2d array
 - collect status
 
-## internal_commmand
+~~## internal_commmand~~
 - pwd  :
     getcwd is the function to get current working directory
 - cd   :
@@ -20,6 +20,6 @@
 
 
 ## N pipe for external_command
-- check pipe count
-- if pipe count == 0 exec 
+~~- check pipe count~~
+~~- if pipe count == 0 exec ~~
 - else n pipe
