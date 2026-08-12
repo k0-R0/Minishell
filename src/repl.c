@@ -9,6 +9,9 @@ const char *builtins[] = {
 const char *cmdv[160];
 int cmd_count;
 
+pid_t child_pid;
+int status;
+
 int check_command_type(char *command) {
     // check builtins
     if (bin_search(builtins, sizeof(builtins) / sizeof(builtins[0]), command) ==
@@ -38,10 +41,20 @@ void scan_input(char *prompt, char *input_string) {
             // printf("cmd -> %s\n", command);
             // check for internal, external or no command
             char command_type = check_command_type(command);
-            if (command_type == NO_COMMAND) {
+            if (command_type == BUILTIN) {
+                execute_internal_commands(input_string);
+            } else if (command_type == EXTERNAL) {
+                child_pid = fork();
+                if (child_pid == -1) {
+                    perror(NULL);
+                } else if (child_pid == 0) {
+                    execute_external_commands(input_string);
+                } else {
+                    waitpid(child_pid, &status, 0);
+                }
+            } else if (command_type == NO_COMMAND) {
                 printf("%sNo such command found\n%s", ANSI_COLOR_RED,
                        ANSI_COLOR_RESET);
-                continue;
             }
             // printf("%d\n", command_type);
         }
