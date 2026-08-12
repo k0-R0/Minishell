@@ -38,7 +38,7 @@ void copy_change(char *prompt, char *input_string);
 
 int check_command_type(char *command);
 int check_prompt_change(char *prompt, char *input_string);
-void echo(char *input_string, int status);
+void echo(char *input_string);
 void execute_internal_commands(char *input_string);
 void execute_external_commands(char *input_string);
 void signal_handler(int sig_num);
