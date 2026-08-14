@@ -1,10 +1,11 @@
 #include "header.h"
 
 const char *builtins[] = {
-    "bind",  "caller", "cd",     "declare", "dirs",    "echo",     "eval",
-    "exec",  "exit",   "export", "getopts", "hash",    "help",     "let",
-    "popd",  "printf", "pushd",  "pwd",     "read",    "readonly", "set",
-    "shopt", "source", "true",   "type",    "typeset", "unset",    NULL};
+    "bg",      "bind",     "caller", "cd",     "declare", "dirs",    "echo",
+    "eval",    "exec",     "exit",   "export", "fg",      "getopts", "hash",
+    "help",    "jobs",     "let",    "popd",   "printf",  "pushd",   "pwd",
+    "read",    "readonly", "set",    "shopt",  "source",  "true",    "type",
+    "typeset", "unset",    NULL};
 
 const char *cmdv[160];
 int cmd_count;
@@ -49,6 +50,7 @@ void scan_input(char *prompt, char *input_string) {
                     perror(NULL);
                 } else if (child_pid == 0) {
                     execute_external_commands(input_string);
+                    exit(0);
                 } else {
                     waitpid(child_pid, &status, 0);
                 }

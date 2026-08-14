@@ -52,11 +52,11 @@ void getwords(char *tokens[], const char *const input_string) {
                    input_string[curr_ind] != ' ')
                 curr_ind++;
             // word length = curr pos - prev , malloc and copy the pointer to it
-            int len = curr_ind - prev_ind;
+            int len = curr_ind - prev_ind + 1;
             char *curr_token = malloc(len * sizeof(char));
             strncpy(curr_token, input_string + prev_ind, len);
+            curr_token[len - 1] = '\0';
             tokens[token_count++] = curr_token;
-            printf("%s\n", tokens[token_count - 1]);
         } else {
             prev_ind = curr_ind++;
         }

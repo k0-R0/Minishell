@@ -68,16 +68,85 @@ void echo(char *input_string) {
     }
 }
 
+int execute_n_pipe(char *tokens[]) {
+    int cmd_ind[100];
+    int pipe_count = 0;
+    int ind = 0;
+    cmd_ind[ind++] = 0;
+    for (int i = 0; tokens[i]; i++) {
+        if (tokens[i][0] == '|' && tokens[i][1] == '\0') {
+            pipe_count++;
+            cmd_ind[ind++] = i + 1;
+            tokens[i] = NULL;
+        }
+    }
+    int fd[2];
+    // prev pipe read
+    int prev_pipe_rd = STDIN_FILENO;
+    for (int i = 0; i <= pipe_count; i++) {
+        // create command - 1 pipes
+        if (i < pipe_count) {
+            if (pipe(fd) == -1) {
+                perror(NULL);
+                return 1;
+            }
+        }
+        int child = fork();
+        if (child == -1) {
+            perror(NULL);
+            return 1;
+        }
+        if (child == 0) {
+            // child process
+            // for all children except first redirect stdin to prev pipe
+            if (i > 0) {
+                dup2(prev_pipe_rd, STDIN_FILENO);
+                close(prev_pipe_rd);
+            }
+            // for all children except last close read end
+            // redirect stdout to their write end
+            if (i < pipe_count) {
+                close(fd[0]);
+                dup2(fd[1], STDOUT_FILENO);
+                close(fd[1]); // duplicate write end
+            }
+            execvp(tokens[cmd_ind[i]], tokens + cmd_ind[i]);
+            perror(NULL);
+            exit(1);
+        } else {
+            // parent process
+            // for all process except first close prev_pipe_rd
+            if (i > 0) {
+                close(prev_pipe_rd);
+            }
+            // for all processes close the write end
+            // and save the read end to prev_pipe_rd (baton)
+            if (i < pipe_count) {
+                close(fd[1]);
+                prev_pipe_rd = fd[0];
+            }
+        }
+    }
+    for (int i = 0; i <= pipe_count; i++)
+        wait(NULL);
+    return 0;
+}
+
 void execute_external_commands(char *input_string) {
     char *tokens[100];
     getwords(tokens, input_string);
     int pipe_count = 0;
     get_pipe_count(tokens, &pipe_count);
+    // printf("pipe_count -> %d\n", pipe_count);
     if (pipe_count == 0) {
         if (execvp(tokens[0], tokens) == -1) {
             perror(NULL);
         }
     } else {
-        printf("%sInvalid argument%s", ANSI_COLOR_RED, ANSI_COLOR_RESET);
+        if (execute_n_pipe(tokens)) {
+            printf("%sError in executing command%s", ANSI_COLOR_RED,
+                   ANSI_COLOR_RESET);
+        }
+        // printf("%sInvalid argument%s", ANSI_COLOR_RED, ANSI_COLOR_RESET);
     }
 }
