@@ -41,7 +41,7 @@ int check_command_type(char *command) {
     return NO_COMMAND;
 }
 
-void scan_input(char *prompt, char *input_string) {
+void scan_input() {
     extract_external_commands(cmdv, &cmd_count);
     signal(SIGINT, my_sigint_handler);
     signal(SIGTSTP, my_sigtstp_handler);
@@ -56,17 +56,17 @@ void scan_input(char *prompt, char *input_string) {
         // Skip if input is empty or contains only spaces and tabs
         if (input_string[strspn(input_string, " \t")] == '\0')
             continue;
-        if (check_prompt_change(prompt, input_string) == 0) {
-            copy_change(prompt, input_string);
+        if (check_prompt_change() == 0) {
+            copy_change();
         }
         // if not get command
         else {
-            char *command = get_command(input_string);
+            char *command = get_command();
             // printf("cmd -> %s\n", command);
             // check for internal, external or no command
             char command_type = check_command_type(command);
             if (command_type == BUILTIN) {
-                execute_internal_commands(input_string);
+                execute_internal_commands();
             } else if (command_type == EXTERNAL) {
                 child_pid = fork();
                 if (child_pid == -1) {
@@ -74,7 +74,7 @@ void scan_input(char *prompt, char *input_string) {
                 } else if (child_pid == 0) {
                     signal(SIGINT, SIG_DFL);
                     signal(SIGTSTP, SIG_DFL);
-                    execute_external_commands(input_string);
+                    execute_external_commands();
                     exit(0);
                 } else {
                     waitpid(child_pid, &status, WUNTRACED);

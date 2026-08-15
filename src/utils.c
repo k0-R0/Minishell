@@ -36,7 +36,7 @@ char bin_search(const char *const argv[], int size, const char *target) {
     return 0;
 }
 
-void getwords(char *tokens[], const char *const input_string, int *count) {
+void getwords(char *tokens[], int *count) {
     int token_count = 0;
     int prev_ind = -1;
     int curr_ind = 0;

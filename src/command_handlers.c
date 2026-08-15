@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 
-int check_prompt_change(char *prompt, char *input_string) {
+int check_prompt_change() {
     if (strlen(input_string) > 4 && strncmp(input_string, "PS1", 3) == 0) {
         if (input_string[3] == '=' && input_string[4] != ' ')
             return 0;
@@ -14,7 +14,8 @@ int check_prompt_change(char *prompt, char *input_string) {
     }
     return 1;
 }
-void copy_change(char *prompt, char *input_string) {
+
+void copy_change() {
     char local_buffer[100];
     sprintf(local_buffer, "%s", input_string + 4);
     local_buffer[strcspn(local_buffer, " ")] = '\0';
@@ -22,7 +23,7 @@ void copy_change(char *prompt, char *input_string) {
             ANSI_COLOR_YELLOW, ANSI_COLOR_RESET);
 }
 
-char *get_command(char *input_string) {
+char *get_command() {
     char local_buffer[100];
     int char_count = strcspn(input_string, " \n");
     strncpy(local_buffer, input_string, char_count);
@@ -32,7 +33,7 @@ char *get_command(char *input_string) {
     return cmd;
 }
 
-void execute_internal_commands(char *input_string) {
+void execute_internal_commands() {
     if (strcmp(input_string, "pwd") == 0) {
         char directory[200];
         getcwd(directory, sizeof(directory));
@@ -48,7 +49,7 @@ void execute_internal_commands(char *input_string) {
     } else if (strcmp(input_string, "exit") == 0) {
         exit(0);
     } else if (strncmp(input_string, "echo ", 5) == 0) {
-        echo(input_string);
+        echo();
     } else if (strcmp(input_string, "jobs") == 0) {
         print_jobs(g_job_list);
     } else if (strcmp(input_string, "fg") == 0) {
@@ -83,7 +84,7 @@ void execute_internal_commands(char *input_string) {
     }
 }
 
-void echo(char *input_string) {
+void echo() {
     char *arg = input_string + 5;
     if (strcmp(arg, "$$") == 0) {
         printf("Process id -> %d", getpid());
@@ -149,10 +150,10 @@ int execute_n_pipe(char *tokens[], int pipe_count, int *cmd_ind) {
     return 0;
 }
 
-void execute_external_commands(char *input_string) {
+void execute_external_commands() {
     char *tokens[100];
     int token_count;
-    getwords(tokens, input_string, &token_count);
+    getwords(tokens, &token_count);
     int pipe_count = 0;
     int cmd_ind[100];
     setup_pipe_commands(tokens, &pipe_count, cmd_ind);
