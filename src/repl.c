@@ -1,4 +1,5 @@
 #include "header.h"
+#include <stdlib.h>
 
 const char *builtins[] = {
     "bg",      "bind",     "caller", "cd",     "declare", "dirs",    "echo",
@@ -10,8 +11,24 @@ const char *builtins[] = {
 const char *cmdv[160];
 int cmd_count;
 
-pid_t child_pid;
 int status;
+
+void my_sigint_handler(int signum) {
+    // only print prompt if there is no child process
+    if (child_pid == 0) {
+        printf("\n%s", prompt);
+        fflush(stdout);
+    }
+}
+
+void my_sigtstp_handler(int signum) {
+    if (child_pid == 0) {
+        printf("\n%s", prompt);
+        fflush(stdout);
+    }
+}
+
+void my_sigchld_handler(int signum) { waitpid(-1, &status, WNOHANG); }
 
 int check_command_type(char *command) {
     // check builtins
@@ -27,6 +44,10 @@ int check_command_type(char *command) {
 
 void scan_input(char *prompt, char *input_string) {
     extract_external_commands(cmdv, &cmd_count);
+    signal(SIGINT, my_sigint_handler);
+    signal(SIGTSTP, my_sigtstp_handler);
+    signal(SIGCHLD, my_sigchld_handler);
+
     while (1) {
         printf("\n%s", prompt);
         // check if it is PS1
@@ -49,10 +70,22 @@ void scan_input(char *prompt, char *input_string) {
                 if (child_pid == -1) {
                     perror(NULL);
                 } else if (child_pid == 0) {
+                    signal(SIGINT, SIG_DFL);
+                    signal(SIGTSTP, SIG_DFL);
                     execute_external_commands(input_string);
                     exit(0);
                 } else {
-                    waitpid(child_pid, &status, 0);
+                    waitpid(child_pid, &status, WUNTRACED);
+                    // record input_string and process id into job list
+                    if (WIFSTOPPED(status)) {
+                        if (insert_job(child_pid, input_string, &g_job_list) ==
+                            1) {
+                            printf("failed to insert job\n");
+                            fflush(stdout);
+                        }
+                    }
+                    // reset child_pid back to 0 for parent signal handling
+                    child_pid = 0;
                 }
             } else if (command_type == NO_COMMAND) {
                 printf("%sNo such command found\n%s", ANSI_COLOR_RED,
