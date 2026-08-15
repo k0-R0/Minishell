@@ -17,8 +17,11 @@ int insert_job(int pid, char *process_name, job **head) {
 }
 
 void print_jobs(job *head) {
-    if (head == NULL)
+    if (head == NULL) {
+        printf("%sNo Process in job list\n%s", ANSI_COLOR_RED,
+               ANSI_COLOR_RESET);
         return;
+    }
     print_jobs(head->next);
     printf("Process ID : %d | Process Name : %s\n", head->pid,
            head->process_name);
