@@ -28,7 +28,7 @@ void my_sigtstp_handler(int signum) {
         fflush(stdout);
     } else {
         // record input_string and process id into job list
-        if (insert_job(child_pid, prompt, &g_job_list) == 1) {
+        if (insert_job(child_pid, input_string, &g_job_list) == 1) {
             printf("failed to insert job\n");
             fflush(stdout);
         }
