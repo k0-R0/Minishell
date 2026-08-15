@@ -50,6 +50,12 @@ void execute_internal_commands(char *input_string) {
         exit(0);
     } else if (strncmp(input_string, "echo ", 5) == 0) {
         echo(input_string);
+    } else if (strcmp(input_string, "jobs") == 0) {
+        print_jobs(g_job_list);
+    } else if (strcmp(input_string, "fg") == 0) {
+        print_jobs(g_job_list);
+    } else if (strcmp(input_string, "bg") == 0) {
+        print_jobs(g_job_list);
     } else {
         printf("%sCommand not found%s", ANSI_COLOR_RED, ANSI_COLOR_RESET);
     }
