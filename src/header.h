@@ -24,6 +24,16 @@
 #define ANSI_COLOR_CYAN "\x1b[36m"
 #define ANSI_COLOR_RESET "\x1b[0m"
 
+// job handler structure
+typedef struct job {
+    int pid;
+    char *process_name;
+    struct job *next;
+} job;
+
+extern job *g_job_list;
+extern char prompt[100];
+extern char input_string[100];
 // default prompt is minishell
 void scan_input(char *prompt, char *input_string);
 
@@ -45,5 +55,8 @@ void signal_handler(int sig_num);
 char bin_search(const char *const argv[], int size, const char *target);
 void getwords(char *tokens[], const char *const input_string);
 void get_pipe_count(char *tokens[], int *pipe_count);
+
+int insert_job(int pid, char *process_name, job **head);
+void print_jobs(job *head);
 
 #endif
