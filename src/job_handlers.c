@@ -6,8 +6,10 @@ int insert_job(int pid, char *process_name, job **head) {
         return 1;
     new_job->pid = pid;
     new_job->process_name = malloc((strlen(process_name) + 1) * sizeof(char));
-    if (new_job->process_name == NULL)
+    if (new_job->process_name == NULL) {
+        free(new_job);
         return 1;
+    }
     strcpy(new_job->process_name, process_name);
     new_job->next = *head;
     *head = new_job;
