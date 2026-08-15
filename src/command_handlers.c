@@ -1,10 +1,9 @@
 #include "header.h"
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-extern int status;
 
 int check_prompt_change(char *prompt, char *input_string) {
     if (strlen(input_string) > 4 && strncmp(input_string, "PS1", 3) == 0) {
@@ -53,7 +52,16 @@ void execute_internal_commands(char *input_string) {
     } else if (strcmp(input_string, "jobs") == 0) {
         print_jobs(g_job_list);
     } else if (strcmp(input_string, "fg") == 0) {
-        print_jobs(g_job_list);
+        int pid_to_resume = g_job_list->pid;
+        printf("Resuming Process:\nProcess ID : %d | Process Name : %s\n",
+               g_job_list->pid, g_job_list->process_name);
+        // resume process
+        kill(pid_to_resume, SIGCONT);
+        // the process can be stopped again so WUNTRACED
+        waitpid(pid_to_resume, &status, WUNTRACED);
+        // if the process is terminated then remove job
+        if (WIFSTOPPED(status) == 0)
+            remove_job(&g_job_list);
     } else if (strcmp(input_string, "bg") == 0) {
         print_jobs(g_job_list);
     } else {

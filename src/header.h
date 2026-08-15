@@ -34,6 +34,7 @@ typedef struct job {
 extern job *g_job_list;
 extern char prompt[100];
 extern char input_string[100];
+extern int status;
 // default prompt is minishell
 void scan_input(char *prompt, char *input_string);
 
@@ -58,5 +59,6 @@ void get_pipe_count(char *tokens[], int *pipe_count);
 
 int insert_job(int pid, char *process_name, job **head);
 void print_jobs(job *head);
+void remove_job(job **head);
 
 #endif
