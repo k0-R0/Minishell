@@ -23,6 +23,15 @@ void my_sigint_handler(int signum) {
     }
 }
 
+void my_sigtstp_handler(int signum) {
+    if (child_pid == 0) {
+        printf("\n%s", prompt);
+        fflush(stdout);
+    } else {
+        // record input_string and process id into job list
+    }
+}
+
 int check_command_type(char *command) {
     // check builtins
     if (bin_search(builtins, sizeof(builtins) / sizeof(builtins[0]), command) ==
@@ -38,7 +47,7 @@ int check_command_type(char *command) {
 void scan_input(char *prompt, char *input_string) {
     extract_external_commands(cmdv, &cmd_count);
     signal(SIGINT, my_sigint_handler);
-    signal(SIGTSTP, SIG_DFL);
+    signal(SIGTSTP, my_sigtstp_handler);
 
     while (1) {
         printf("\n%s", prompt);
