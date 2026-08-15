@@ -31,8 +31,8 @@ void my_sigchld_handler(int signum) { waitpid(-1, &status, WNOHANG); }
 
 int check_command_type(char *command) {
     // check builtins
-    if (bin_search(builtins, sizeof(builtins) / sizeof(builtins[0]), command) ==
-        1)
+    if (bin_search(builtins, sizeof(builtins) / sizeof(builtins[0]) - 1,
+                   command) == 1)
         return BUILTIN;
     // check externals
     if (bin_search(cmdv, cmd_count, command) == 1)

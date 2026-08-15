@@ -137,6 +137,7 @@ uncompress
 unicode_start
 vdir
 vmmouse_detect
+wc
 which
 whiptail
 ypdomainname

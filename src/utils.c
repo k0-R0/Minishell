@@ -7,7 +7,6 @@ void extract_external_commands(const char *cmdv[], int *cmd_count) {
         return;
     }
     int cmd_ind = 0;
-    char ch;
     while (feof(fptr) == 0) {
         char local_buffer[100];
         if (fgets(local_buffer, 100, fptr) == NULL)
@@ -44,7 +43,7 @@ void getwords(char *tokens[], int *count) {
     while (input_string[curr_ind]) {
         char curr = input_string[curr_ind];
         char prev = (prev_ind == -1) ? ' ' : input_string[prev_ind];
-        if (prev == ' ' && curr != ' ') {
+        if ((prev == '\t' || prev == ' ') && curr != ' ') {
             // word found when prev is ' ' and curr is not ' '
             prev_ind = curr_ind;
             // iterate forward till curr is NULL or ' ' that is the end of word

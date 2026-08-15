@@ -53,7 +53,6 @@ int check_prompt_change();
 void echo();
 void execute_internal_commands();
 void execute_external_commands();
-void signal_handler(int sig_num);
 char bin_search(const char *const argv[], int size, const char *target);
 void getwords(char *tokens[], int *token_count);
 void setup_pipe_commands(char *tokens[], int *pipe_count, int *cmd_ind);
