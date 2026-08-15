@@ -1,4 +1,5 @@
 #include "header.h"
+#include <stdlib.h>
 
 const char *builtins[] = {
     "bg",      "bind",     "caller", "cd",     "declare", "dirs",    "echo",
@@ -12,8 +13,6 @@ int cmd_count;
 
 pid_t child_pid;
 int status;
-
-extern char prompt[100];
 
 void my_sigint_handler(int signum) {
     // only print prompt if there is no child process
@@ -29,6 +28,10 @@ void my_sigtstp_handler(int signum) {
         fflush(stdout);
     } else {
         // record input_string and process id into job list
+        if (insert_job(child_pid, prompt, &g_job_list) == 1) {
+            printf("failed to insert job\n");
+            fflush(stdout);
+        }
     }
 }
 
@@ -76,7 +79,7 @@ void scan_input(char *prompt, char *input_string) {
                     execute_external_commands(input_string);
                     exit(0);
                 } else {
-                    waitpid(child_pid, &status, 0);
+                    waitpid(child_pid, &status, WUNTRACED);
                     // reset child_pid back to 0 for parent signal handling
                     child_pid = 0;
                 }
