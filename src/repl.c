@@ -13,6 +13,16 @@ int cmd_count;
 pid_t child_pid;
 int status;
 
+extern char prompt[100];
+
+void my_sigint_handler(int signum) {
+    // only print prompt if there is no child process
+    if (child_pid == 0) {
+        printf("\n%s", prompt);
+        fflush(stdout);
+    }
+}
+
 int check_command_type(char *command) {
     // check builtins
     if (bin_search(builtins, sizeof(builtins) / sizeof(builtins[0]), command) ==
@@ -27,6 +37,9 @@ int check_command_type(char *command) {
 
 void scan_input(char *prompt, char *input_string) {
     extract_external_commands(cmdv, &cmd_count);
+    signal(SIGINT, my_sigint_handler);
+    signal(SIGTSTP, SIG_DFL);
+
     while (1) {
         printf("\n%s", prompt);
         // check if it is PS1
@@ -49,10 +62,14 @@ void scan_input(char *prompt, char *input_string) {
                 if (child_pid == -1) {
                     perror(NULL);
                 } else if (child_pid == 0) {
+                    signal(SIGINT, SIG_DFL);
+                    signal(SIGTSTP, SIG_DFL);
                     execute_external_commands(input_string);
                     exit(0);
                 } else {
                     waitpid(child_pid, &status, 0);
+                    // reset child_pid back to 0 for parent signal handling
+                    child_pid = 0;
                 }
             } else if (command_type == NO_COMMAND) {
                 printf("%sNo such command found\n%s", ANSI_COLOR_RED,
