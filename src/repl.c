@@ -19,7 +19,7 @@ int check_command_type(char *command) {
         1)
         return BUILTIN;
     // check externals
-    if (bin_search(cmdv, sizeof(cmdv) / sizeof(cmdv[0]), command) == 1)
+    if (bin_search(cmdv, cmd_count, command) == 1)
         return EXTERNAL;
     // if none return non command
     return NO_COMMAND;
