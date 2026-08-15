@@ -1,5 +1,4 @@
 #include "header.h"
-#include <stdlib.h>
 
 const char *builtins[] = {
     "bg",      "bind",     "caller", "cd",     "declare", "dirs",    "echo",
@@ -54,6 +53,9 @@ void scan_input(char *prompt, char *input_string) {
         // if it is copy_change prompt
         fgets(input_string, 100, stdin);
         input_string[strcspn(input_string, "\n")] = '\0';
+        // Skip if input is empty or contains only spaces and tabs
+        if (input_string[strspn(input_string, " \t")] == '\0')
+            continue;
         if (check_prompt_change(prompt, input_string) == 0) {
             copy_change(prompt, input_string);
         }
