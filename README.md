@@ -1,76 +1,110 @@
-~~## external_command~~
-- fork
-- keep pid ,status(wait) global
-- convert input string to a 2d array
-- collect status
+# Minishell
 
-~~## internal_commmand~~
-- pwd  :
-    getcwd is the function to get current working directory
-- cd   :
-    chdir to change directory
-- exit :
-    exit(0) for exit
-- echo()
-    - echo $$ - print the minishell process id
-    - echo $? - print the last status
-    - echo $SHELL - print the env ; getenv()
+A lightweight, custom Unix command-line shell implemented in C. It supports built-in commands, external program execution, dynamic prompt customization, multi-pipe command chaining, and basic job control with signal handling.
 
+---
 
-## N pipe for external_command
-~~- check pipe count~~
-~~- if pipe count == 0 exec ~~
-- else n pipe
-    - test 
-    - ~~for each pipe store NULL~~
-    - ~~store cmd_ind in an array~~
-    - take backup of stdin , stdout
-    - ?? child doesn't continue the loop **IT DOES**
-    - **UNDERSTAND HOW TO CLOSE AND OPEN MULTIPLE PIPES IN LOOP**
-    - don't create pipe for the last child
-    - don't do stuff with the pipe for the last child, it already has stdin and stdout setup
+## Features
 
-## Signals
-writing your own handler is called "registering" a signal?
-sa_flag = 0 -> sa_handler is called else the macro would be used and sa_sigaction is called
--   SIGINT in parent should just print prompt again
-    -   keep prompt and input string in global
--   if external is running SIGINT should terminate the child(external)
--   SIGTSTP child process should take default behavior
-    - jobs , fg , bg are all internal_commands
-    -   jobs stack where fg and bg pop the last job
-        - fg foreground execution of the child
-        - bg background execution of the child wait nohang? (no user input programs)
+### 1. Built-in Commands
+* **`pwd`**: Prints the current working directory.
+* **`cd <path>`**: Changes the working directory to the specified path.
+* **`echo`**: Supports environment and status variable inspections:
+  * `echo $$` — Prints the shell's process ID.
+  * `echo $?` — Prints the exit status of the last executed command.
+  * `echo $SHELL` — Prints the default shell environment variable (`getenv("SHELL")`).
+* **`PS1=<new_prompt>`**: Dynamically updates the shell prompt.
+* **`exit`**: Exits the Minishell process.
 
-- jobs structure
-    - char *command
-    - pid_t *pid
-    - structure *pointer
-    - stack using ll
+### 2. External Command Execution & Pipelining
+* **Single Command Execution**: Executes system binaries via `fork()` and `execvp()`.
+* **N-Pipes Support (`|`)**: Supports arbitrarily chained pipelines (e.g., `cat file | grep pattern | wc -l`) using `pipe()` and `dup2()`.
 
-- use WUNTRACED in the waitpid for child so that it returns when child is terminated as well as stopped
+### 3. Job Control & Signal Management
+* **`Ctrl + C` (`SIGINT`)**: Interrupts and terminates the active foreground process without exiting the shell.
+* **`Ctrl + Z` (`SIGTSTP`)**: Suspends the active foreground process and pushes it onto the stopped jobs list.
+* **`jobs`**: Lists all currently suspended processes.
+* **`fg`**: Resumes the most recent suspended job in the foreground and waits for its completion.
+* **`bg`**: Resumes the most recent suspended job in the background and returns to the prompt immediately.
 
-- delete node on completion - check status
+---
 
-- bg same as fg except it doesn't block parent
+## Project Structure
 
-- parent handler will take backup of job ; inside handler if pid > 0
+```text
+Minishell/
+├── Makefile                # Build configuration
+├── README.md               # Project documentation
+├── external_commands.txt   # List of supported external commands
+└── src/
+    ├── header.h            # Structures, macros, colors, and declarations
+    ├── main.c              # Entry point and prompt initialization
+    ├── repl.c              # REPL loop, input scanning, and signal handlers
+    ├── command_handlers.c  # Built-ins, external commands, and pipeline logic
+    ├── job_handlers.c      # Job stack linked list management (insert/remove/print)
+    └── utils.c             # Tokenizer, pipeline parser, and binary search
+```
 
-- update pid in child to 0 after execute_external_commands
+---
 
-- check SIGCHLD?
+## Building and Running
 
+### Prerequisites
+* GCC compiler
+* GNU Make
+* Linux / POSIX environment
 
------------------
+### Compilation
+To compile the shell and generate the `minishell` executable:
 
-## Resources to free
+```bash
+make
+```
 
-- command list 
-- job list 
-- 
+### Running the Shell
+Launch Minishell by executing:
 
+```bash
+./minishell
+```
 
-## cleanup code 
-- ~~pipe count and modification is repeated~~
-- ~~empty command not error~~
-- ~~external commands binary search size to be fixed~~
+### Cleaning Up
+To remove compiled object files and the generated executable:
+
+```bash
+make clean
+```
+
+---
+
+## Example Usage
+
+```bash
+# Basic external command execution
+Mini$hell> ls -la
+
+# Pipelining multiple commands
+Mini$hell> cat /etc/passwd | grep root | wc -l
+
+# Customizing the prompt
+Mini$hell> PS1=my_shell
+my_shell> pwd
+/home/user/Minishell
+
+# Checking shell PID and exit status
+my_shell> echo $$
+Process id -> 12345
+my_shell> echo $?
+Exit status -> 0
+
+# Job control with Ctrl+Z, jobs, bg, and fg
+my_shell> sleep 100
+^Z
+my_shell> jobs
+Process ID : 12350 | Process Name : sleep 100
+
+my_shell> bg
+[12350] sleep 100 &
+
+my_shell> exit
+```
