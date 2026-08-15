@@ -52,18 +52,24 @@ void execute_internal_commands(char *input_string) {
     } else if (strcmp(input_string, "jobs") == 0) {
         print_jobs(g_job_list);
     } else if (strcmp(input_string, "fg") == 0) {
-        int pid_to_resume = g_job_list->pid;
-        printf("Resuming Process:\nProcess ID : %d | Process Name : %s\n",
-               g_job_list->pid, g_job_list->process_name);
-        // resume process
-        kill(pid_to_resume, SIGCONT);
-        // the process can be stopped again so WUNTRACED
-        waitpid(pid_to_resume, &status, WUNTRACED);
-        // if the process is terminated then remove job
-        if (WIFSTOPPED(status) == 0)
-            remove_job(&g_job_list);
+        if (g_job_list == NULL) {
+            printf("%sNo Process to resume\n%s", ANSI_COLOR_RED,
+                   ANSI_COLOR_RESET);
+        } else {
+            int pid_to_resume = g_job_list->pid;
+            printf("Resuming Process:\nProcess ID : %d | Process Name : %s\n",
+                   g_job_list->pid, g_job_list->process_name);
+            // resume process
+            child_pid = pid_to_resume;
+            kill(pid_to_resume, SIGCONT);
+            // the process can be stopped again so WUNTRACED
+            waitpid(pid_to_resume, &status, WUNTRACED);
+            child_pid = 0;
+            // if the process is terminated then remove job
+            if (WIFSTOPPED(status) == 0)
+                remove_job(&g_job_list);
+        }
     } else if (strcmp(input_string, "bg") == 0) {
-        print_jobs(g_job_list);
     } else {
         printf("%sCommand not found%s", ANSI_COLOR_RED, ANSI_COLOR_RESET);
     }

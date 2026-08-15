@@ -35,6 +35,7 @@ extern job *g_job_list;
 extern char prompt[100];
 extern char input_string[100];
 extern int status;
+extern pid_t child_pid;
 // default prompt is minishell
 void scan_input(char *prompt, char *input_string);
 
