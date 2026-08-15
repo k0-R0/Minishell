@@ -55,8 +55,9 @@ void execute_internal_commands(char *input_string);
 void execute_external_commands(char *input_string);
 void signal_handler(int sig_num);
 char bin_search(const char *const argv[], int size, const char *target);
-void getwords(char *tokens[], const char *const input_string);
-void get_pipe_count(char *tokens[], int *pipe_count);
+void getwords(char *tokens[], const char *const input_string, int *token_count);
+void setup_pipe_commands(char *tokens[], int *pipe_count, int *cmd_ind);
+void free_tokens(char *tokens[], int token_count);
 
 int insert_job(int pid, char *process_name, job **head);
 void print_jobs(job *head);

@@ -71,6 +71,6 @@ sa_flag = 0 -> sa_handler is called else the macro would be used and sa_sigactio
 
 
 ## cleanup code 
-- pipe count and modification is repeated
+- ~~pipe count and modification is repeated~~
 - empty command not error
-- external commands binary search size to be fixed
+- ~~external commands binary search size to be fixed~~

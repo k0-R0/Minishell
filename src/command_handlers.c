@@ -96,18 +96,7 @@ void echo(char *input_string) {
     }
 }
 
-int execute_n_pipe(char *tokens[]) {
-    int cmd_ind[100];
-    int pipe_count = 0;
-    int ind = 0;
-    cmd_ind[ind++] = 0;
-    for (int i = 0; tokens[i]; i++) {
-        if (tokens[i][0] == '|' && tokens[i][1] == '\0') {
-            pipe_count++;
-            cmd_ind[ind++] = i + 1;
-            tokens[i] = NULL;
-        }
-    }
+int execute_n_pipe(char *tokens[], int pipe_count, int *cmd_ind) {
     int fd[2];
     // prev pipe read
     int prev_pipe_rd = STDIN_FILENO;
@@ -162,19 +151,23 @@ int execute_n_pipe(char *tokens[]) {
 
 void execute_external_commands(char *input_string) {
     char *tokens[100];
-    getwords(tokens, input_string);
+    int token_count;
+    getwords(tokens, input_string, &token_count);
     int pipe_count = 0;
-    get_pipe_count(tokens, &pipe_count);
+    int cmd_ind[100];
+    setup_pipe_commands(tokens, &pipe_count, cmd_ind);
     // printf("pipe_count -> %d\n", pipe_count);
     if (pipe_count == 0) {
         if (execvp(tokens[0], tokens) == -1) {
             perror(NULL);
         }
     } else {
-        if (execute_n_pipe(tokens)) {
+        if (execute_n_pipe(tokens, pipe_count, cmd_ind)) {
             printf("%sError in executing command%s", ANSI_COLOR_RED,
                    ANSI_COLOR_RESET);
         }
         // printf("%sInvalid argument%s", ANSI_COLOR_RED, ANSI_COLOR_RESET);
     }
+    // free tokens
+    free_tokens(tokens, token_count);
 }

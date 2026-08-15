@@ -36,7 +36,7 @@ char bin_search(const char *const argv[], int size, const char *target) {
     return 0;
 }
 
-void getwords(char *tokens[], const char *const input_string) {
+void getwords(char *tokens[], const char *const input_string, int *count) {
     int token_count = 0;
     int prev_ind = -1;
     int curr_ind = 0;
@@ -62,15 +62,28 @@ void getwords(char *tokens[], const char *const input_string) {
         }
     }
     tokens[token_count++] = NULL;
+    *count = token_count;
 }
 
-void get_pipe_count(char *tokens[], int *pipe_count) {
+void setup_pipe_commands(char *tokens[], int *pipe_count, int *cmd_ind) {
     int count = 0;
     int ind = 0;
-    while (tokens[ind]) {
-        if (strlen(tokens[ind]) == 1 && tokens[ind][0] == '|')
+    cmd_ind[ind++] = 0;
+
+    for (int i = 0; tokens[i]; i++) {
+        if (tokens[i][0] == '|' && tokens[i][1] == '\0') {
             count++;
-        ind++;
+            cmd_ind[ind++] = i + 1;
+            free(tokens[i]);
+            tokens[i] = NULL;
+        }
     }
     *pipe_count = count;
+}
+
+void free_tokens(char *tokens[], int token_count) {
+    for (int i = 0; i < token_count; i++) {
+        if (tokens[i])
+            free(tokens[i]);
+    }
 }
